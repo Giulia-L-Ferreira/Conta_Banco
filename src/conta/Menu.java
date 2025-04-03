@@ -1,6 +1,7 @@
 package conta;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.util.Scanner;
 
 import conta.controller.ContaController;
@@ -15,9 +16,9 @@ public class Menu {
 		ContaController contas = new ContaController();
 
 		Scanner ler = new Scanner(System.in);
-		int opcao, numero, agencia, tipo, aniversario;
+		int opcao, numero, agencia, tipo, aniversario, numeroDestino = 0;
 		String titular;
-		float saldo, limite;
+		float saldo, limite, valor;
 
 		while (true) {
 
@@ -100,8 +101,13 @@ public class Menu {
 				break;
 
 			case 3:
-				System.out.println("\nConsultar dados da conta por numero");
+				System.out.println("\nProcurar conta por numero");
 				System.out.println("------------------------------------------------------\n\n");
+				
+				System.out.println("Digite o número da conta: ");
+				numero = ler.nextInt();
+				
+				contas.procurarPorNumero(numero);
 
 				keyPress();
 				break;
@@ -109,6 +115,41 @@ public class Menu {
 			case 4:
 				System.out.println("\nAtualizar dados da conta");
 				System.out.println("------------------------------------------------------\n\n");
+				
+				System.out.println("Digite o numero da conta: ");
+				numero = ler.nextInt();
+				
+				var buscaConta = contas.buscarNaCollection(numero);
+				
+				if(buscaConta != null) {
+					
+					tipo = buscaConta.getTipo();
+					
+					System.out.println("Digite o numero da agência: ");
+					agencia = ler.nextInt();
+					System.out.println("\nDigite o Nome do titular: ");
+					ler.skip("\\R?");
+					titular = ler.nextLine();
+					
+					System.out.println("\nDigite o saldo da conta (R$): ");
+					saldo = ler.nextFloat();
+					
+					switch (tipo) {
+					case 1 -> {
+						System.out.println("\nDigite o limite de crédito (R$): ");
+						limite = ler.nextFloat();
+					}
+					case 2 -> {
+						System.out.println("\nDigite o dia do aniversário da conta: ");
+						aniversario = ler.nextInt();
+					}
+					default -> {
+						System.err.println("\nTipo de conta inválido!");
+					}
+					}
+				}else {
+					System.err.println("A conta não foi encontrada!");
+				}
 
 				keyPress();
 				break;
@@ -117,12 +158,27 @@ public class Menu {
 				System.out.println(Cores.TEXT_YELLOW_BOLD_BRIGHT + "\nApagar a conta" + Cores.TEXT_RESET);
 				System.out.println("------------------------------------------------------\n\n");
 				
+				System.out.println("\nDigite o numero da conta: ");
+				numero = ler.nextInt();
+				
+				contas.deletar(numero);
+				
 				keyPress();
 				break;
 
 			case 6:
 				System.out.println("\nSaque");
 				System.out.println("------------------------------------------------------\n\n");
+				
+				System.out.println("\nDigite o numero da conta: ");
+				numero = ler.nextInt();
+				
+				do {
+					System.out.println("\nDigite o valor do saque: ");
+					valor = ler.nextFloat();
+				}while (valor <= 0);
+				
+				contas.sacar(numero, valor);
 
 				keyPress();
 				break;
@@ -131,12 +187,38 @@ public class Menu {
 				System.out.println("\nDepósito");
 				System.out.println("------------------------------------------------------\n\n");
 				
+				System.out.println("\nDigite o numero da conta: ");
+				numero = ler.nextInt();
+				
+				do {
+					System.out.println("Digite o valor do sepósito: ");
+					valor = ler.nextInt();
+				}while(valor <= 0);
+				
+				contas.depositar(numero, valor);
+				
 				keyPress();
 				break;
 
 			case 8:
 				System.out.println("\nTransferência entre contas");
 				System.out.println("------------------------------------------------------\n\n");
+				
+				System.out.println("\nDigite o numero da conta: ");
+				numero = ler.nextInt();
+				
+				System.out.println("\nDigite o numero da conta de origem: ");
+				numero = ler.nextInt();
+				System.out.println("\nDigite o numero da conta de destrino: ");
+				numero = ler.nextInt();
+				
+				do {
+					System.out.println("Digite o valor da transferência ");
+					valor = ler.nextFloat();
+					
+				}while(valor <= 0);
+				
+				contas.transferir(numero, numeroDestino, valor);
 				
 				keyPress();
 				break;
